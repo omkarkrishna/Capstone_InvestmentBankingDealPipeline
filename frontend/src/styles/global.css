@@ -1,0 +1,14 @@
+body {
+  margin: 0;
+  font-family: "Inter", "Roboto", sans-serif;
+  background-color: #f4f6f8;
+}
+
+.app-container {
+  padding: 24px;
+}
+
+.page-title {
+  font-weight: 600;
+  margin-bottom: 16px;
+}
