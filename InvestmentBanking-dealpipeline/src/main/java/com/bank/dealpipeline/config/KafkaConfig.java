@@ -1,5 +1,5 @@
 package com.bank.dealpipeline.config;
-
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -45,4 +45,16 @@ public class KafkaConfig {
 
         return new DefaultKafkaConsumerFactory<>(config);
     }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, String>
+    kafkaListenerContainerFactory() {
+
+        ConcurrentKafkaListenerContainerFactory<String, String> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+
+        factory.setConsumerFactory(consumerFactory());
+        return factory;
+    }
+
 }
