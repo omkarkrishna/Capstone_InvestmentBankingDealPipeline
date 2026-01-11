@@ -41,21 +41,24 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(auth -> auth
 
+                        // ✅ allow CORS preflight
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+
                         // public
                         .requestMatchers("/api/auth/login", "/actuator/**").permitAll()
 
                         // admin-only
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        // deals (USER + ADMIN)
+                        // deals
                         .requestMatchers("/api/deals/**").hasAnyRole("USER", "ADMIN")
 
-                        // analytics (USER + ADMIN)
+                        // analytics
                         .requestMatchers("/api/analytics/**").hasAnyRole("USER", "ADMIN")
 
-                        // everything else
                         .anyRequest().authenticated()
                 )
+
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
