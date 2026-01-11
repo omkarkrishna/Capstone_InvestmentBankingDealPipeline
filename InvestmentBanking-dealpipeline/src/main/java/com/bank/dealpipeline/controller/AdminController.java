@@ -21,7 +21,7 @@ public class AdminController {
     }
 
     // 1️ CREATE USER (ADMIN)
-  //  @PreAuthorize("hasRole('ADMIN')")
+   @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/users")
     public String createUser(@Valid @RequestBody CreateUserRequest request) {
         userService.createUser(request);
