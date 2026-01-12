@@ -20,15 +20,8 @@ public class DealEventProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void publishDealCreatedEvent(String dealId, String stage) {
-        publishEvent("DEAL_CREATED", dealId, stage);
-    }
+    public void publishDealEvent(String eventType, String dealId, String stage) {
 
-    public void publishDealStageUpdatedEvent(String dealId, String stage) {
-        publishEvent("DEAL_STAGE_UPDATED", dealId, stage);
-    }
-
-    private void publishEvent(String eventType, String dealId, String stage) {
         try {
             Map<String, Object> event = new HashMap<>();
             event.put("eventType", eventType);
@@ -40,7 +33,7 @@ public class DealEventProducer {
             kafkaTemplate.send(TOPIC, message);
 
         } catch (Exception e) {
-            System.out.println("Failed to publish Kafka event: " + e.getMessage());
+            System.out.println("Kafka publish failed: " + e.getMessage());
         }
     }
 }

@@ -1,12 +1,10 @@
 package com.bank.dealpipeline.service;
+
 import com.bank.dealpipeline.kafka.DealEventProducer;
 import com.bank.dealpipeline.dto.DealRequest;
 import com.bank.dealpipeline.dto.UpdateDealRequest;
 import com.bank.dealpipeline.exception.ResourceNotFoundException;
-import com.bank.dealpipeline.model.Deal;
-import com.bank.dealpipeline.model.DealActivity;
-import com.bank.dealpipeline.model.DealNote;
-import com.bank.dealpipeline.model.DealStage;
+import com.bank.dealpipeline.model.*;
 import com.bank.dealpipeline.repository.DealRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +17,13 @@ public class DealService {
     private final DealRepository dealRepository;
     private final DealEventProducer dealEventProducer;
 
-
-    public DealService(DealRepository dealRepository,DealEventProducer dealEventProducer) {
+    public DealService(DealRepository dealRepository,
+                       DealEventProducer dealEventProducer) {
         this.dealRepository = dealRepository;
         this.dealEventProducer = dealEventProducer;
     }
 
-    // CREATE DEAL
+    // create deal
     public Deal createDeal(DealRequest request, String username) {
 
         Deal deal = new Deal();
@@ -39,8 +37,10 @@ public class DealService {
                 new DealActivity("Deal created", username)
         );
 
-        Deal savedDeal= dealRepository.save(deal);
-        dealEventProducer.publishDealCreatedEvent(
+        Deal savedDeal = dealRepository.save(deal);
+
+        dealEventProducer.publishDealEvent(
+                "DEAL_CREATED",
                 savedDeal.getId(),
                 savedDeal.getStage().name()
         );
@@ -48,12 +48,12 @@ public class DealService {
         return savedDeal;
     }
 
-    // GET ALL DEALS
+    // get all deals
     public List<Deal> getAllDeals() {
         return dealRepository.findAll();
     }
 
-    // UPDATE DEAL STAGE
+    // update deal stage
     public Deal updateDealStage(String dealId, DealStage stage) {
 
         Deal deal = dealRepository.findById(dealId)
@@ -72,7 +72,9 @@ public class DealService {
         );
 
         Deal updatedDeal = dealRepository.save(deal);
-        dealEventProducer.publishDealStageUpdatedEvent(
+
+        dealEventProducer.publishDealEvent(
+                "DEAL_STAGE_UPDATED",
                 updatedDeal.getId(),
                 updatedDeal.getStage().name()
         );
@@ -80,14 +82,13 @@ public class DealService {
         return updatedDeal;
     }
 
-    //  ADD NOTE TO DEAL
+    // add note to deal
     public Deal addNoteToDeal(String dealId, String noteText, String username) {
 
         Deal deal = dealRepository.findById(dealId)
                 .orElseThrow(() -> new ResourceNotFoundException("Deal not found"));
 
-        DealNote note = new DealNote(noteText, username);
-        deal.getNotes().add(note);
+        deal.getNotes().add(new DealNote(noteText, username));
         deal.setUpdatedAt(LocalDateTime.now());
 
         deal.getActivities().add(
@@ -97,7 +98,7 @@ public class DealService {
         return dealRepository.save(deal);
     }
 
-    // UPDATE DEAL VALUE (ADMIN)
+    // update deal value
     public Deal updateDealValue(String dealId, Double dealValue) {
 
         Deal deal = dealRepository.findById(dealId)
@@ -115,15 +116,23 @@ public class DealService {
                 )
         );
 
-        return dealRepository.save(deal);
+        Deal updatedDeal = dealRepository.save(deal);
+
+        dealEventProducer.publishDealEvent(
+                "DEAL_VALUE_UPDATED",
+                updatedDeal.getId(),
+                updatedDeal.getStage().name()
+        );
+
+        return updatedDeal;
     }
 
-    //  FILTER DEALS BY STAGE
+    // filter deals by stage
     public List<Deal> getDealsByStage(DealStage stage) {
         return dealRepository.findByStage(stage);
     }
 
-    // UPDATE DEAL DETAILS
+    // update deal details
     public Deal updateDeal(String dealId, UpdateDealRequest request) {
 
         Deal deal = dealRepository.findById(dealId)
@@ -141,31 +150,29 @@ public class DealService {
         return dealRepository.save(deal);
     }
 
-    // DELETE DEAL
+    // delete deal
     public void deleteDeal(String dealId) {
 
         Deal deal = dealRepository.findById(dealId)
                 .orElseThrow(() -> new ResourceNotFoundException("Deal not found"));
 
-        deal.getActivities().add(
-                new DealActivity("Deal deleted", "ADMIN")
+        dealEventProducer.publishDealEvent(
+                "DEAL_DELETED",
+                deal.getId(),
+                deal.getStage().name()
         );
 
         dealRepository.delete(deal);
     }
 
-    //  GET DEAL BY ID (ROLE BASED)
+    // get deal by id with role based filtering
     public Deal getDealById(String dealId, String role) {
 
         Deal deal = dealRepository.findById(dealId)
                 .orElseThrow(() -> new ResourceNotFoundException("Deal not found"));
 
         if ("USER".equals(role)) {
-
-            // hide sensitive value
             deal.setDealValue(null);
-
-            // hide value related activities
             deal.getActivities().removeIf(
                     a -> a.getMessage().toLowerCase().contains("value")
             );
