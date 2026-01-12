@@ -34,7 +34,7 @@ services:
       - mongodb
       - kafka
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/dealpipeline
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/deal_pipeline_db
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
   frontend:
