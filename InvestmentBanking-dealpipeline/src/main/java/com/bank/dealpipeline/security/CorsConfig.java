@@ -17,13 +17,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
-
-        // ✅ Allow both local + EC2 frontend
-        config.setAllowedOrigins(List.of(
-                "http://localhost:5173",   // local Vite
-                "http://localhost:3000",   // docker local
-                "http://3.7.191.173:3000"  // EC2 frontend
-        ));
+        config.setAllowedOrigins(List.of("*"));
 
         config.setAllowedHeaders(List.of("*"));
         config.setAllowedMethods(List.of(
