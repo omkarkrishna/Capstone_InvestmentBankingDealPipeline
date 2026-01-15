@@ -35,7 +35,7 @@ const DealBoard = () => {
         }}
       >
         <Typography variant="h4" fontWeight={600}>
-          Deal Pipeline
+          Deal Inventory
         </Typography>
         <CreateDealDialog />
       </Box>
