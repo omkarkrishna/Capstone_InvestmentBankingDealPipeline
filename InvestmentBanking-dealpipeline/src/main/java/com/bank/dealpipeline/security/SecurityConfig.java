@@ -37,11 +37,10 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
-                // ✅ IMPORTANT: wire CORS here
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(auth -> auth
 
-                        // ✅ allow CORS preflight
+                        //allow CORS preflight
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 
                         // public

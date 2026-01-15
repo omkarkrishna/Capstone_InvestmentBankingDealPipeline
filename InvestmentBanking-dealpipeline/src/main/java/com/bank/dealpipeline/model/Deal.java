@@ -36,7 +36,7 @@ public class Deal {
         return notes;
     }
     // deal value
-    private Double dealValue; // sensitive (ADMIN only)
+    private Double dealValue; // sensitive
 
     public Double getDealValue() {
         return dealValue;
