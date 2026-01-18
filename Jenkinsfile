@@ -67,5 +67,16 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to EC2 using Docker Compose') {
+    steps {
+        sh '''
+        cd /home/ubuntu/Capstone_InvestmentBankingDealPipeline
+        docker-compose pull
+        docker-compose up -d
+        '''
+    }
+}
+
     }
 }
