@@ -72,11 +72,12 @@ pipeline {
     steps {
         sh '''
         cd $WORKSPACE
-        docker-compose pull
-        docker-compose up -d
+        docker compose pull
+        docker compose up -d
         '''
     }
 }
+
 
 
     }
