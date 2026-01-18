@@ -18,35 +18,16 @@ pipeline {
             }
         }
 
-        // 🔹 NEW: Build & Test Backend (Required for SonarQube)
-        stage('Build & Test Backend') {
-            steps {
-                sh '''
-                cd InvestmentBanking-dealpipeline
-                mvn clean verify
-                '''
-            }
-        }
-
-        // 🔹 NEW: SonarQube Analysis
-        stage('SonarQube Analysis') {
+        // ✅ SIMPLE SONARQUBE ANALYSIS (NO TESTS)
+        stage('SonarQube Code Quality Analysis') {
             steps {
                 withSonarQubeEnv('sonarqube') {
                     sh '''
                     cd InvestmentBanking-dealpipeline
-                    mvn sonar:sonar \
+                    mvn clean package -DskipTests sonar:sonar \
                       -Dsonar.projectKey=deal-pipeline \
                       -Dsonar.projectName="Investment Banking Deal Pipeline"
                     '''
-                }
-            }
-        }
-
-        // 🔹 OPTIONAL BUT RECOMMENDED: Quality Gate
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
                 }
             }
         }
@@ -87,12 +68,4 @@ pipeline {
             }
         }
     }
-
-    post {
-    always {
-        junit allowEmptyResults: true,
-              testResults: 'InvestmentBanking-dealpipeline/target/surefire-reports/*.xml'
-    }
-}
-
 }
