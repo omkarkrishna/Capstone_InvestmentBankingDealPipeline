@@ -18,6 +18,39 @@ pipeline {
             }
         }
 
+        // 🔹 NEW: Build & Test Backend (Required for SonarQube)
+        stage('Build & Test Backend') {
+            steps {
+                sh '''
+                cd InvestmentBanking-dealpipeline
+                mvn clean verify
+                '''
+            }
+        }
+
+        // 🔹 NEW: SonarQube Analysis
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('sonarqube') {
+                    sh '''
+                    cd InvestmentBanking-dealpipeline
+                    mvn sonar:sonar \
+                      -Dsonar.projectKey=deal-pipeline \
+                      -Dsonar.projectName="Investment Banking Deal Pipeline"
+                    '''
+                }
+            }
+        }
+
+        // 🔹 OPTIONAL BUT RECOMMENDED: Quality Gate
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
         stage('Build Backend Image') {
             steps {
                 sh '''
@@ -52,6 +85,13 @@ pipeline {
                     '''
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            // 🔹 Publish JUnit test results in Jenkins UI
+            junit 'InvestmentBanking-dealpipeline/target/surefire-reports/*.xml'
         }
     }
 }
