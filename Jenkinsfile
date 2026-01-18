@@ -18,15 +18,15 @@ pipeline {
             }
         }
 
-        // ✅ SIMPLE SONARQUBE ANALYSIS (NO TESTS)
-        stage('SonarQube Code Quality Analysis') {
+        // ✅ ONLY ADDITION — NOTHING ELSE
+        stage('SonarQube Code Scan') {
             steps {
                 withSonarQubeEnv('sonarqube') {
                     sh '''
                     cd InvestmentBanking-dealpipeline
-                    mvn clean package -DskipTests sonar:sonar \
-                      -Dsonar.projectKey=deal-pipeline \
-                      -Dsonar.projectName="Investment Banking Deal Pipeline"
+                    mvn -DskipTests \
+                    org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                    -Dsonar.projectKey=deal-pipeline
                     '''
                 }
             }
