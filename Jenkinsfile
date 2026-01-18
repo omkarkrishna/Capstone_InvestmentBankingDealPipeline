@@ -89,9 +89,10 @@ pipeline {
     }
 
     post {
-        always {
-            // 🔹 Publish JUnit test results in Jenkins UI
-            junit 'InvestmentBanking-dealpipeline/target/surefire-reports/*.xml'
-        }
+    always {
+        junit allowEmptyResults: true,
+              testResults: 'InvestmentBanking-dealpipeline/target/surefire-reports/*.xml'
     }
+}
+
 }
