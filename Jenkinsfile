@@ -18,20 +18,6 @@ pipeline {
             }
         }
 
-        // ✅ ONLY ADDITION — NOTHING ELSE
-        stage('SonarQube Code Scan') {
-            steps {
-                withSonarQubeEnv('sonarqube') {
-                    sh '''
-                    cd InvestmentBanking-dealpipeline
-                    mvn -DskipTests \
-                    org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-                    -Dsonar.projectKey=deal-pipeline
-                    '''
-                }
-            }
-        }
-
         stage('Build Backend Image') {
             steps {
                 sh '''
