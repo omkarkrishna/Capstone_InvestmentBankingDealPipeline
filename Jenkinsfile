@@ -4,7 +4,6 @@ pipeline {
     environment {
         AWS_REGION = "ap-south-1"
         AWS_ACCOUNT_ID = "091113170910"
-
         BACKEND_ECR = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/ib-backend"
         FRONTEND_ECR = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/ib-frontend"
     }
@@ -20,21 +19,17 @@ pipeline {
 
         stage('Build Backend Image') {
             steps {
-                sh '''
-                docker build -t ib-backend ./InvestmentBanking-dealpipeline
-                '''
+                sh 'docker build -t ib-backend ./InvestmentBanking-dealpipeline'
             }
         }
 
         stage('Build Frontend Image') {
             steps {
-                sh '''
-                docker build -t ib-frontend ./frontend
-                '''
+                sh 'docker build -t ib-frontend ./frontend'
             }
         }
 
-        stage('Login to ECR & Push Images') {
+        stage('Push to ECR') {
             steps {
                 withCredentials([
                     string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
@@ -53,18 +48,5 @@ pipeline {
                 }
             }
         }
-
-        stage('Deploy to EC2 using Docker Compose') {
-    steps {
-        sh '''
-        cd $WORKSPACE
-        docker compose pull
-        docker compose up -d
-        '''
-    }
-}
-
-
-
     }
 }
