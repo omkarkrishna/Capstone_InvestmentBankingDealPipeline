@@ -48,14 +48,14 @@ pipeline {
                 }
             }
         }
-        stage('Deploy to EC2 using Docker Compose') {
+       stage('Deploy to EC2 using Docker Compose') {
     steps {
         withCredentials([
             string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
             string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
         ]) {
             sh '''
-            cd /home/ubuntu/Capstone_InvestmentBankingDealPipeline
+            cd $WORKSPACE
 
             aws ecr get-login-password --region ap-south-1 |
             docker login --username AWS --password-stdin 091113170910.dkr.ecr.ap-south-1.amazonaws.com
@@ -67,6 +67,7 @@ pipeline {
         }
     }
 }
+
 
     }
 }
